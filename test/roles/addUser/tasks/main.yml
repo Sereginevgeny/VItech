@@ -1,0 +1,39 @@
+---
+- name: Добавить пользователя dev
+  ansible.builtin.user:
+    name: dev
+    state: present
+    create_home: yes
+    shell: /bin/bash
+
+- name: Создать .ssh директорию для пользователя dev
+  ansible.builtin.file:
+    path: /home/dev/.ssh
+    state: directory
+    owner: dev
+    group: dev
+    mode: '0700'
+
+- name: Копировать публичный ключ для пользователя dev
+  ansible.builtin.copy:
+    src: files/authorized_keys
+    dest: /home/dev/.ssh/authorized_keys
+    owner: dev
+    group: dev
+    mode: '0600'
+
+- name: Отключить SSH доступ по паролю и от root
+  ansible.builtin.template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart ssh
+
+- name: Установить утилиты диагностики
+  ansible.builtin.apt:
+    name:
+      - htop
+      - net-tools
+    state: present
