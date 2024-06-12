@@ -1,0 +1,24 @@
+---
+- name: Создания каталога /opt/dockerdev/
+  ansible.builtin.file:
+    path: /opt/dockerdev/
+    state: directory
+    mode: '0755'
+
+- name: Копирование докерфайла в /opt/dockerdev/
+  ansible.builtin.copy:
+    src: Dockerfile
+    dest: /opt/dockerdev/Dockerfile
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Удаление образа с именем test если он уже существует
+  ansible.builtin.shell: |
+    docker rmi -f test || true
+  ignore_errors: true
+  become: true
+
+- name: Сборка докер образа с именем test
+  ansible.builtin.command: docker build -t test /opt/dockerdev/
+  become: true
