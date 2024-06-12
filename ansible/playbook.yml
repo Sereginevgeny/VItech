@@ -2,4 +2,6 @@
 - hosts: myHost
   become: yes
   roles:
+    - addUser
+    - addDocker
     - copyDockerfile
